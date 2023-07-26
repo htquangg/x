@@ -13,9 +13,9 @@ import (
 type BaseResponse[T any] struct {
 	// Code represents the business code, not the http status code.
 	Code int `json:"code"`
-	// Err represents the business message, if Code = BusinessCodeOK,
-	// and Err is empty, then the Err will be set to BusinessMsgOk.
-	Err string `json:"msg"`
+	// Msg represents the business message, if Code = BusinessCodeOK,
+	// and Msg is empty, then the Msg will be set to BusinessMsgOk.
+	Msg string `json:"msg"`
 	// Data represents the business data.
 	Data T `json:"data,omitempty"`
 }
@@ -32,9 +32,10 @@ func wrapSuccessResponse(v any) BaseResponse[any] {
 	var resp BaseResponse[any]
 
 	resp.Code = BusinessCodeOK
+	resp.Msg = BusinessMsgOk
 	switch data := v.(type) {
 	case *status.Status:
-		resp.Err = data.Message()
+		resp.Data = data.Message()
 	default:
 		resp.Data = v
 	}
@@ -48,19 +49,19 @@ func wrapErrorResponse(v any) BaseResponse[any] {
 	switch data := v.(type) {
 	case *errors.CodeMsg:
 		resp.Code = data.Code
-		resp.Err = data.Msg
+		resp.Msg = data.Msg
 	case errors.CodeMsg:
 		resp.Code = data.Code
-		resp.Err = data.Msg
+		resp.Msg = data.Msg
 	case *status.Status:
 		resp.Code = BusinessCodeError
-		resp.Err = data.Message()
+		resp.Msg = data.Message()
 	case error:
 		resp.Code = BusinessCodeError
-		resp.Err = data.Error()
+		resp.Msg = data.Error()
 	default:
 		resp.Code = BusinessCodeError
-		resp.Err = BusinessMsgError
+		resp.Msg = BusinessMsgError
 	}
 
 	return resp
