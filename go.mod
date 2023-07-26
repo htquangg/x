@@ -1,4 +1,4 @@
-module github.com/zeromicro/x
+module github.com/htquangg/x
 
 go 1.18
 
